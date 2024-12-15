@@ -1,12 +1,21 @@
 #!/usr/bin/env guile
 !#
 
-(add-to-load-path "..")
+(use-modules (srfi srfi-1))
+
+(define parent-directory
+  (string-join
+   (drop-right
+    (string-split (current-filename)
+		  (string->char-set file-name-separator-string))
+    2)
+   file-name-separator-string))
+
+(add-to-load-path parent-directory)
 
 (use-modules (ice-9 arrays)
 	     (ice-9 match)
 	     (ice-9 textual-ports)
-	     (srfi srfi-1)
 	     (srfi srfi-26)
 	     (scram grid))
 
