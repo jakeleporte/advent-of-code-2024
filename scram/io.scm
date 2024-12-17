@@ -2,7 +2,7 @@
   #:use-module (ice-9 textual-ports)
   #:export (find-string
 	    find-char
-	    read-string
+	    expect-string
 	    read-number))
 
 (define (find-string port str)
@@ -35,7 +35,7 @@ the matching character, and push it back to the input port."
       curr-char)
      (else (loop (get-char port))))))
 
-(define (read-string port str)
+(define (expect-string port str)
   "Attempt to read the string STR from the current position of PORT.
 Return #t and advance past the matching string if it matches,
 otherwise return #f, and push any portion of unmatched string already
