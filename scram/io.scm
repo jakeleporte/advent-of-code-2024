@@ -1,9 +1,19 @@
 (define-module (scram io)
   #:use-module (ice-9 textual-ports)
-  #:export (find-string
+  #:export (print
+	    display*
+	    find-string
 	    find-char
 	    expect-string
 	    read-number))
+
+(define print
+  (lambda objs
+    (for-each (lambda (obj) (display obj) (newline)) objs)))
+
+(define display*
+  (lambda objs
+    (for-each display objs)))
 
 (define (find-string port str)
   "Search through the input PORT until either a string matching STR is
@@ -68,6 +78,7 @@ digit."
      (loop (get-char port)
 	   (string-append number-string (string curr-char)))
      (begin
-       (unget-char port curr-char)
+       (unless (eof-object? curr-char)
+	 (unget-char port curr-char))
        (if (string-null? number-string) #f
 	   (string->number number-string))))))
