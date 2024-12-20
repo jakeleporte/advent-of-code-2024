@@ -1,20 +1,26 @@
 #!/usr/bin/env guile
 !#
 
+(eval-when (expand load eval)
+  (define parent-directory
+    (string-join
+     (reverse
+      (cdr
+       (reverse
+	(string-split (dirname (current-filename))
+		      (string->char-set file-name-separator-string)))))
+     file-name-separator-string)))
+
+(add-to-load-path parent-directory)
+
 (use-modules (ice-9 rdelim)
-	     (srfi srfi-26))
+	     (srfi srfi-26)
+	     (scram function))
 
 (define (read-towels port)
   (string-tokenize (read-line port) char-set:letter))
 
-(define (memoized-procedure proc)
-  (define cache (make-hash-table))
-  (lambda args
-    (or (hash-ref cache (cdr args))
-	(let ((val (apply proc args)))
-	  (hash-set! cache (cdr args) val)))))
-
-(define (design-options towels design)
+(define-memoized (design-options towels design)
   (define prefixes (filter (cute string-prefix? <> design) towels))
   (define remaining (map (lambda (s) (string-drop design (string-length s)))
 			 prefixes))
@@ -23,8 +29,6 @@
       (apply
        +
        (map (cute design-options towels <>) remaining))))
-
-(set! design-options (memoized-procedure design-options))
 
 (define (count-towel-matches towels port)
   (let loop ((line (read-line port))
